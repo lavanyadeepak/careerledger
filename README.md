@@ -15,7 +15,7 @@ Built with **Node.js + Express + TypeScript**, **PostgreSQL 16+**, **Prisma ORM*
 | Follow-Up Engine | Auto-calculates follow-ups (Applied + 7 days) |
 | Dashboard | Stats + charts (by month, company, status) |
 | Export | Excel and CSV export with filters |
-| Email Sending | Microsoft Graph API integration |
+| Email Sending | Microsoft Graph API integration; or configure MailGun API key for alternative email sending |
 # ResumeTracker
 
 Personal Job Application Tracker — a lightweight Applicant Tracking System (ATS) for a single job seeker.
@@ -33,7 +33,7 @@ Built with **Node.js + Express + TypeScript**, **PostgreSQL 16+**, **Prisma ORM*
 | **Follow-Up Engine** | Auto-calculates follow-ups (Applied + 7 days); dashboard shows overdue / today / next 7 days |
 | **Dashboard** | Stats (applications, interviews, offers, rejections, pending followups) + charts (by month, company, status) |
 | **Export** | Excel and CSV export with filters |
-| **Email Sending** | Microsoft Graph API integration; captures MessageId; stores only metadata in EmailAudit |
+| **Email Sending** | Microsoft Graph API integration; or configure MailGun API key for alternative email sending; captures MessageId; stores only metadata in EmailAudit |
 
 ## Design Principles
 
@@ -297,6 +297,13 @@ After `npm run seed`:
 |----------|-------------|
 | `DATABASE_URL` | PostgreSQL connection string |
 | `JWT_SECRET` | Signing key for access tokens |
+| `MS_GRAPH_CLIENT_ID` | Azure AD app client ID |
+| `MS_GRAPH_CLIENT_SECRET` | Azure AD app client secret |
+| `MS_GRAPH_TENANT_ID` | Azure AD tenant ID (or `common`) |
+| `MS_GRAPH_SENDER_EMAIL` | Sender mailbox address |
+| `MAILGUN_API_KEY` | MailGun API key |
+| `MAILGUN_DOMAIN` | Verified MailGun domain |
+| `MAIL_FROM` | Sender email address |
 
 ## Microsoft Graph Setup
 
@@ -306,6 +313,16 @@ After `npm run seed`:
 4. Add Client ID / Client Secret / Tenant ID to `backend/.env`.
 5. Set `MS_GRAPH_SENDER_EMAIL` to your mailbox address.
 6. In the app, open **Settings → Connect Microsoft Account** and complete OAuth consent.
+
+## MailGun Setup
+
+1. Sign up for a MailGun account at [mailgun.com](https://mailgun.com).
+2. Verify your domain in the MailGun dashboard.
+3. Add the following to `backend/.env`:
+   - `MAILGUN_API_KEY=your_mailgun_api_key`
+   - `MAILGUN_DOMAIN=your_verified_mailgun_domain`
+   - `MAIL_FROM=your@sender.com`
+4. In the app, open **Settings → Connect MailGun** and verify the connection.
 
 ## Environment Variables
 

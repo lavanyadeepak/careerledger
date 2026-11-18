@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { asyncHandler, AppError } from "../middleware/error";
 import { db } from "../config/db";
-import { graphService } from "../services/graphService";
+import { MailService } from "../services/mailService";
 import { renderTemplate } from "../utils/mergeTokens";
 
 export const sendEmail = asyncHandler(async (req: Request, res: Response) => {
@@ -44,7 +44,7 @@ export const sendEmail = asyncHandler(async (req: Request, res: Response) => {
     attachmentPath = application.resume.filePath;
   }
 
-  const result = await graphService.sendEmail({
+  const result = await MailService.sendEmail({
     to: recipientEmail,
     subject,
     body,
@@ -94,25 +94,16 @@ export const sendEmail = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getGraphAuthUrl = asyncHandler(async (req: Request, res: Response) => {
-  const url = graphService.getAuthUrl();
-  res.json({ data: { authUrl: url } });
+  res.json({ data: { message: "MailGun is used instead of Microsoft Graph. No auth URL needed." } });
 });
 
 export const handleGraphCallback = asyncHandler(async (req: Request, res: Response) => {
-  const { code } = req.query as { code?: string };
-  if (!code) {
-    throw new AppError("Missing authorization code", 400);
-  }
-  await graphService.exchangeCodeForTokens(code as string);
-  res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/settings?graph=connected`);
+  res.json({ data: { message: "MailGun is used instead of Microsoft Graph. No callback needed." } });
 });
 
 export const checkGraphStatus = asyncHandler(async (req: Request, res: Response) => {
   const configured = Boolean(
-    process.env.MS_GRAPH_CLIENT_ID &&
-    process.env.MS_GRAPH_CLIENT_SECRET &&
-    process.env.MS_GRAPH_SENDER_EMAIL
+    process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN && process.env.MAIL_FROM
   );
-  const token = await db.graphToken.findFirst();
-  res.json({ data: { configured, connected: Boolean(token) } });
+  res.json({ data: { configured } });
 });

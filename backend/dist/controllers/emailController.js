@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkGraphStatus = exports.handleGraphCallback = exports.getGraphAuthUrl = exports.sendEmail = void 0;
 const error_1 = require("../middleware/error");
 const db_1 = require("../config/db");
-const graphService_1 = require("../services/graphService");
+const mailService_1 = require("../services/mailService");
 const mergeTokens_1 = require("../utils/mergeTokens");
 exports.sendEmail = (0, error_1.asyncHandler)(async (req, res) => {
     const { applicationId, templateId, templateVersion, resumeId, mergeData, } = req.body;
@@ -28,7 +28,7 @@ exports.sendEmail = (0, error_1.asyncHandler)(async (req, res) => {
     if (application.resume?.filePath) {
         attachmentPath = application.resume.filePath;
     }
-    const result = await graphService_1.graphService.sendEmail({
+    const result = await mailService_1.MailService.sendEmail({
         to: recipientEmail,
         subject,
         body,
@@ -72,22 +72,13 @@ exports.sendEmail = (0, error_1.asyncHandler)(async (req, res) => {
     });
 });
 exports.getGraphAuthUrl = (0, error_1.asyncHandler)(async (req, res) => {
-    const url = graphService_1.graphService.getAuthUrl();
-    res.json({ data: { authUrl: url } });
+    res.json({ data: { message: "MailGun is used instead of Microsoft Graph. No auth URL needed." } });
 });
 exports.handleGraphCallback = (0, error_1.asyncHandler)(async (req, res) => {
-    const { code } = req.query;
-    if (!code) {
-        throw new error_1.AppError("Missing authorization code", 400);
-    }
-    await graphService_1.graphService.exchangeCodeForTokens(code);
-    res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/settings?graph=connected`);
+    res.json({ data: { message: "MailGun is used instead of Microsoft Graph. No callback needed." } });
 });
 exports.checkGraphStatus = (0, error_1.asyncHandler)(async (req, res) => {
-    const configured = Boolean(process.env.MS_GRAPH_CLIENT_ID &&
-        process.env.MS_GRAPH_CLIENT_SECRET &&
-        process.env.MS_GRAPH_SENDER_EMAIL);
-    const token = await db_1.db.graphToken.findFirst();
-    res.json({ data: { configured, connected: Boolean(token) } });
+    const configured = Boolean(process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN && process.env.MAIL_FROM);
+    res.json({ data: { configured } });
 });
 //# sourceMappingURL=emailController.js.map

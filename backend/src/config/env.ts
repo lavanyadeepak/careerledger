@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+// Resolve from the backend directory so this works whether the server is
+// started from the repository root, backend/, or the compiled dist folder.
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const required = ["DATABASE_URL", "JWT_SECRET"];
 for (const key of required) {
@@ -24,6 +27,9 @@ export const env = {
   msGraphRedirectUri: process.env.MS_GRAPH_REDIRECT_URI || "",
   msGraphSenderEmail: process.env.MS_GRAPH_SENDER_EMAIL || "",
   msGraphScopes: (process.env.MS_GRAPH_SCOPES || "Mail.Send User.Read offline_access").split(" "),
+  mailgunApiKey: process.env.MAILGUN_API_KEY || "",
+  mailgunDomain: process.env.MAILGUN_DOMAIN || "",
+  mailFrom: process.env.MAIL_FROM || "",
   resumeUploadDir: process.env.RESUME_UPLOAD_DIR || "./uploads/resumes",
   maxFileSize: parseInt(process.env.MAX_FILE_SIZE || "10485760", 10),
   encryptionKey: process.env.ENCRYPTION_KEY || "default-key-change-me",

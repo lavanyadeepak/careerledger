@@ -13,6 +13,9 @@ export declare const env: {
     msGraphRedirectUri: string;
     msGraphSenderEmail: string;
     msGraphScopes: string[];
+    mailgunApiKey: string;
+    mailgunDomain: string;
+    mailFrom: string;
     resumeUploadDir: string;
     maxFileSize: number;
     encryptionKey: string;

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   Box, Container, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip, Dialog, DialogTitle, DialogContent, DialogActions, TextField as MuiTextField, CircularProgress, Typography, Select, MenuItem, Tabs, Tab
 } from "@mui/material";
-import { Event, Schedule, ArrowRight, Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import { Event, Schedule, ArrowRight, MailOutlined, Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import api, { Followup } from "../services/api";
 
 function TabPanel({ children, value, index }: { children: React.ReactNode; value: number; index: number }) {

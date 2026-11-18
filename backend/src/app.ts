@@ -12,6 +12,7 @@ import applicationRoutes from "./routes/applications";
 import followupRoutes from "./routes/followups";
 import dashboardRoutes from "./routes/dashboard";
 import exportRoutes from "./routes/export";
+import mailgunRoutes from "./routes/mailgun";
 import emailRoutes from "./routes/email";
 
 export function createApp() {
@@ -37,6 +38,7 @@ export function createApp() {
   app.use("/api/followups", followupRoutes);
   app.use("/api/dashboard", dashboardRoutes);
   app.use("/api/export", exportRoutes);
+  app.use("/api/email/mailgun", mailgunRoutes);
   app.use("/api/email", emailRoutes);
 
   app.use(errorHandler);

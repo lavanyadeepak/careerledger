@@ -11,18 +11,23 @@ export default function SettingsPage() {
   const [senderEmail, setSenderEmail] = useState("");
 
   useEffect(() => {
-    api.get<{ data: any }>("/email/graph/status").then((res) => {
+    api.get<{ data: any }>("/email/mailgun/status").then((res) => {
       setStatus(res.data.data);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
 
-  const handleConnect = () => {
-    window.location.href = "/api/auth/microsoft/graph/login";
+  const handleConnectMailgun = async () => {
+    try {
+      const res = await api.get<{ data: { configured: boolean; connected: boolean } }>("/email/mailgun/login");
+      setStatus(res.data.data);
+    } catch {
+      setStatus({ configured: false, connected: false });
+    }
   };
 
   const handleSaveSender = async () => {
-    alert("Sender email saved to .env (MS_GRAPH_SENDER_EMAIL). Restart backend to apply.");
+    alert("Sender email saved to .env (MAIL_FROM). Restart backend to apply.");
   };
 
   return (
@@ -33,7 +38,7 @@ export default function SettingsPage() {
       </Box>
 
       <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>Microsoft Graph Integration</Typography>
+        <Typography variant="h6" gutterBottom>MailGun Integration</Typography>
         {loading ? (
           <Box sx={{ pt: 2, display: "flex", justifyContent: "center" }}><CircularProgress /></Box>
         ) : (
@@ -43,12 +48,11 @@ export default function SettingsPage() {
               <Chip label={status?.connected ? "Connected" : "Not connected"} color={status?.connected ? "success" : "default"} />
             </Box>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Connect Microsoft Outlook via Microsoft Graph API to send application emails with resume attachments.
-              Only metadata (MessageId, recipient, subject, sent date) is stored — full email bodies are never saved.
+              Connect MailGun to send application emails. Emails will be sent from the configured MailGun domain.
             </Typography>
             {!status?.connected && (
-              <Button variant="contained" startIcon={<MailOutlined />} onClick={handleConnect}>
-                Connect Microsoft Account
+              <Button variant="contained" startIcon={<MailOutlined />} onClick={handleConnectMailgun}>
+                Connect MailGun
               </Button>
             )}
             {status?.connected && (
@@ -62,15 +66,14 @@ export default function SettingsPage() {
         <Typography variant="h6" gutterBottom>Sender Email</Typography>
         <TextField
           fullWidth
-          label="Sender email address (MS_GRAPH_SENDER_EMAIL)"
+          label="Sender email address (MAIL_FROM)"
           value={senderEmail}
           onChange={(e) => setSenderEmail(e.target.value)}
           helperText="Set in backend .env and restart server"
         />
         <Button variant="contained" startIcon={<LockOutlined />} onClick={handleSaveSender}>Save</Button>
         <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-          Emails are sent from the configured Microsoft 365 mailbox. Register an app in Azure AD, grant Mail.Send,
-          and configure MS_GRAPH_CLIENT_ID / MS_GRAPH_CLIENT_SECRET / MS_GRAPH_TENANT_ID in backend/.env.
+          Emails are sent via MailGun API. Configure MAILGUN_API_KEY, MAILGUN_DOMAIN, and MAIL_FROM in backend/.env.
         </Typography>
       </Paper>
     </Container>

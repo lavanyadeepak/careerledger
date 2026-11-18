@@ -18,6 +18,7 @@ const applications_1 = __importDefault(require("./routes/applications"));
 const followups_1 = __importDefault(require("./routes/followups"));
 const dashboard_1 = __importDefault(require("./routes/dashboard"));
 const export_1 = __importDefault(require("./routes/export"));
+const mailgun_1 = __importDefault(require("./routes/mailgun"));
 const email_1 = __importDefault(require("./routes/email"));
 function createApp() {
     const app = (0, express_1.default)();
@@ -39,6 +40,7 @@ function createApp() {
     app.use("/api/followups", followups_1.default);
     app.use("/api/dashboard", dashboard_1.default);
     app.use("/api/export", export_1.default);
+    app.use("/api/email/mailgun", mailgun_1.default);
     app.use("/api/email", email_1.default);
     app.use(error_1.errorHandler);
     return app;

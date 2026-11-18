@@ -38,8 +38,5 @@ const auth_1 = require("../middleware/auth");
 const emailController = __importStar(require("../controllers/emailController"));
 const router = (0, express_1.Router)();
 router.post("/send", auth_1.authenticate, emailController.sendEmail);
-router.get("/graph/login", auth_1.authenticate, emailController.getGraphAuthUrl);
-router.get("/graph/callback", emailController.handleGraphCallback);
-router.get("/graph/status", auth_1.authenticate, emailController.checkGraphStatus);
 exports.default = router;
 //# sourceMappingURL=email.js.map
