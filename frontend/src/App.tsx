@@ -16,6 +16,7 @@ import {
   Divider,
   Snackbar,
   Alert,
+  useMediaQuery,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -53,6 +54,7 @@ function AppContent() {
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackMsg, setSnackMsg] = useState("");
   const location = useLocation();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
 
   const triggerSnack = (msg: string) => {
     setSnackMsg(msg);
@@ -77,9 +79,17 @@ function AppContent() {
   const drawer = (
     <Drawer
       anchor="left"
-      open={mobileOpen}
+      variant={isDesktop ? "permanent" : "temporary"}
+      open={isDesktop || mobileOpen}
       onClose={() => setMobileOpen(false)}
-      sx={{ width: { md: 260 }, flexShrink: { md: 0 } }}
+      sx={{
+        width: { md: 260 },
+        flexShrink: { md: 0 },
+        "& .MuiDrawer-paper": {
+          width: 260,
+          boxSizing: "border-box",
+        },
+      }}
     >
       <Toolbar sx={{ pt: 1, pb: 2 }}>
         <Typography
