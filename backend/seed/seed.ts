@@ -25,7 +25,7 @@ async function main() {
       email: "sarah.johnson@techcorp.com",
       designation: "Technical Recruiter",
       company: "TechCorp Solutions",
-      linkedInUrl: "https://linkedin.com/in/sarahjohnson",
+      linkedInUrl: "https://linkedin.com",
       phone: "+1-555-0101",
       source: "LinkedIn",
       notes: "Senior Architect role, responded quickly",
@@ -37,7 +37,7 @@ async function main() {
       email: "m.chen@databyte.io",
       designation: "Engineering Manager",
       company: "DataByte Systems",
-      linkedInUrl: "https://linkedin.com/in/michaelchen",
+      linkedInUrl: "https://linkedin.com",
       phone: "+1-555-0202",
       source: "Referral",
       notes: "Referred by former colleague",
@@ -50,7 +50,7 @@ async function main() {
       designation: "Talent Acquisition",
       company: "CloudScale Inc",
       phone: "+1-555-0303",
-      source: "Company Website",
+      source: "CompanyWebsite",
       notes: "Applied via careers page",
     },
   });
@@ -58,46 +58,6 @@ async function main() {
 
   // Create email templates
   const t1 = await db.template.create({
-
-  // Create applications
-  const now = new Date();
-  const a1 = await db.application.create({
-    data: {
-      recruiterId: r1.id,
-      templateId: t1.id,
-      templateVersion: 1,
-      resumeId: resume1.id,
-      position: "Senior Architect",
-      location: "Remote",
-      source: "LinkedIn",
-      appliedDate: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000),
-      status: "Applied",
-      mergeData: {
-        RecruiterName: "Sarah Johnson",
-        Company: "TechCorp Solutions",
-        Position: "Senior Architect",
-        Location: "Remote",
-      },
-      createdBy: user.id,
-    },
-  });
-  await db.followup.create({
-    data: {
-      applicationId: a1.id,
-      followupDate: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
-      status: "Sent",
-    },
-  });
-  const a2 = await db.application.create({
-    data: {
-      recruiterId: r2.id,
-      templateId: t1.id,
-      templateVersion: 1,
-      resumeId: resume2.id,
-      position: "Lead Developer",
-      location: "New York, NY",
-      source: "Referral",
-      appliedDate: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000),
     data: {
       templateName: "Application - Architect",
       subjectTemplate: "Application for {Position}",
@@ -145,6 +105,44 @@ Deepak Kumar Vasudevan`,
     },
   });
   console.log("Created resumes:", resume1.id, resume2.id);
+
+  // Create applications
+  const now = new Date();
+  const a1 = await db.application.create({
+    data: {
+      recruiterId: r1.id,
+      templateId: t1.id,
+      templateVersion: 1,
+      resumeId: resume1.id,
+      position: "Senior Architect",
+      location: "Remote",
+      source: "LinkedIn",
+      appliedDate: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000),
+      status: "Applied",
+      mergeData: {
+        RecruiterName: "Sarah Johnson",
+        Company: "TechCorp Solutions",
+        Position: "Senior Architect",
+        Location: "Remote",
+      },
+      createdBy: user.id,
+    },
+  });
+  await db.followup.create({
+    data: {
+      applicationId: a1.id,
+      followupDate: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
+      status: "Sent",
+    },
+  });
+
+  const a2 = await db.application.create({
+    data: {
+      recruiterId: r2.id,
+      templateId: t1.id,
+      templateVersion: 1,
+      resumeId: resume2.id,
+      position: "Lead Developer",
       location: "New York, NY",
       source: "Referral",
       appliedDate: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000),
@@ -158,12 +156,13 @@ Deepak Kumar Vasudevan`,
       createdBy: user.id,
     },
   });
+
   const a3 = await db.application.create({
     data: {
       recruiterId: r3.id,
       position: "Cloud Architect",
       location: "Chicago, IL",
-      source: "Company Website",
+      source: "CompanyWebsite",
       appliedDate: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
       status: "Draft",
       mergeData: {
