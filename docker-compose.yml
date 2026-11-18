@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: resumetracker-db
+    environment:
+      POSTGRES_DB: resumetracker
+      POSTGRES_USER: resumetracker
+      POSTGRES_PASSWORD: resumetracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U resumetracker -d resumetracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: resumetracker-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/uploads:/app/uploads
+    environment:
+      DATABASE_URL: "postgresql://resumetracker:resumetracker@postgres:5432/resumetracker?schema=public"
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: resumetracker-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3001
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

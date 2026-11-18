@@ -1,0 +1,211 @@
+// ResumeTracker Prisma Schema
+// Personal ATS for a single job seeker
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ApplicationStatus {
+  Draft
+  Applied
+  FollowupDue
+  FollowupSent
+  InterviewScheduled
+  TechnicalRound
+  HRRound
+  OfferReceived
+  Rejected
+  Closed
+}
+
+enum ApplicationSource {
+  Naukri
+  LinkedIn
+  Foundit
+  Referral
+  DirectRecruiter
+  CompanyWebsite
+  XTwitter
+  WhatsApp
+}
+
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  email         String    @unique
+  name          String?
+  passwordHash  String
+  role          String    @default("user")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  applications  Application[]
+  emailAudit    EmailAudit[]
+  followups     Followup[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model Recruiter {
+  id            String         @id @default(uuid()) @db.Uuid
+  name          String
+  email         String?
+  designation   String?
+  company       String?
+  linkedInUrl   String?        @db.VarChar(500)
+  phone         String?
+  source        ApplicationSource @default(DirectRecruiter)
+  notes         String?
+  createdDate   DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  applications  Application[]
+
+  @@index([company])
+  @@index([email])
+  @@map("recruiters")
+}
+
+model Template {
+  id            String      @id @default(uuid()) @db.Uuid
+  templateName  String
+  subjectTemplate String
+  bodyTemplate   String
+  version       Int         @default(1)
+  isActive      Boolean     @default(true)
+  createdDate   DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  versions      TemplateVersion[]
+  applications  Application[]
+
+  @@map("templates")
+}
+
+model TemplateVersion {
+  id            String   @id @default(uuid()) @db.Uuid
+  templateId    String   @db.Uuid
+  template      Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  subjectTemplate String
+  bodyTemplate   String
+  version       Int
+  createdDate   DateTime @default(now())
+
+  @@map("template_versions")
+}
+
+model Resume {
+  id            String   @id @default(uuid()) @db.Uuid
+  resumeName    String
+  version       String   @default("1.0")
+  filePath      String
+  fileSize      Int?
+  mimeType      String?
+  isDefault     Boolean  @default(false)
+  createdDate   DateTime @default(now())
+
+  applications  Application[]
+
+  @@map("resumes")
+}
+
+model Application {
+  id              String            @id @default(uuid()) @db.Uuid
+  recruiterId     String            @db.Uuid
+  recruiter       Recruiter         @relation(fields: [recruiterId], references: [id])
+  templateId      String?           @db.Uuid
+  template        Template?         @relation(fields: [templateId], references: [id])
+  templateVersion Int?
+  resumeId        String?           @db.Uuid
+  resume          Resume?           @relation(fields: [resumeId], references: [id])
+  position        String
+  location        String?
+  source          ApplicationSource @default(DirectRecruiter)
+  appliedDate     DateTime          @default(now())
+  status          ApplicationStatus @default(Draft)
+  messageId       String?
+  recipientEmail  String?
+  sentTimestamp   DateTime?
+  nextFollowupDate DateTime?
+  remarks         String?
+  mergeData       Json?
+  createdBy       String?           @db.Uuid
+  creator         User?             @relation(fields: [createdBy], references: [id])
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  followups       Followup[]
+  emailAudit      EmailAudit[]
+
+  @@index([recruiterId])
+  @@index([status])
+  @@index([appliedDate])
+  @@index([nextFollowupDate])
+  @@map("applications")
+}
+
+model Followup {
+  id             String   @id @default(uuid()) @db.Uuid
+  applicationId  String   @db.Uuid
+  application    Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  followupDate   DateTime
+  status         String   @default("Pending") // Pending, Sent, Completed, Skipped
+  notes          String?
+  messageId      String?
+  sentDate       DateTime?
+  createdBy      String?  @db.Uuid
+  creator        User?    @relation(fields: [createdBy], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([applicationId])
+  @@index([followupDate])
+  @@index([status])
+  @@map("followups")
+}
+
+model EmailAudit {
+  id             String   @id @default(uuid()) @db.Uuid
+  applicationId  String   @db.Uuid
+  application    Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  messageId      String?
+  recipient      String
+  subject        String?
+  sentDate       DateTime @default(now())
+  createdBy      String?  @db.Uuid
+  creator        User?    @relation(fields: [createdBy], references: [id])
+
+  @@index([applicationId])
+  @@index([messageId])
+  @@index([sentDate])
+  @@map("email_audit")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  token     String   @unique
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model GraphToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  accessToken  String
+  refreshToken String?
+  expiresAt  DateTime
+  scope      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("graph_tokens")
+}
