@@ -11,7 +11,25 @@ import {
   ArrowRight,
 } from "@mui/icons-material";
 import { Bar, Pie } from "react-chartjs-2";
+import {
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  Tooltip,
+} from "chart.js";
 import api, { DashboardStats, FollowupGroup, MonthStat, CompanyStat, StatusDist, Followup } from "../services/api";
+
+ChartJS.register(
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Legend,
+  Tooltip,
+);
 
 export default function DashboardPage({ setSnack }: { setSnack: (msg: string) => void }) {
   const [stats, setStats] = useState<DashboardStats | null>(null);
