@@ -95,6 +95,44 @@ export const createRecruiter = asyncHandler(
   }
 );
 
+export const bulkCreateRecruiters = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { emails } = req.body as { emails?: string[] };
+
+    if (!emails || !Array.isArray(emails) || emails.length === 0) {
+      throw new AppError("At least one email is required", 400);
+    }
+
+    const created = [];
+    for (const email of emails) {
+      const trimmed = (email || "").trim();
+      if (!trimmed) continue;
+
+      // Skip recruiters that already exist with the same email
+      const existing = await db.recruiter.findFirst({
+        where: { email: { equals: trimmed, mode: "insensitive" } },
+      });
+      if (existing) {
+        created.push(existing);
+        continue;
+      }
+
+      const domainPart = trimmed.split("@")[1] || "";
+      const recruiter = await db.recruiter.create({
+        data: {
+          name: trimmed,
+          email: trimmed,
+          company: domainPart ? domainPart.split(".")[0] : undefined,
+          source: ApplicationSource.DirectRecruiter,
+        },
+      });
+      created.push(recruiter);
+    }
+
+    res.status(201).json({ data: created });
+  }
+);
+
 export const updateRecruiter = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, designation, company, linkedInUrl, phone, source, notes } =
     req.body as {

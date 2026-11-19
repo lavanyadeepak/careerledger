@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import {
-  Box, Container, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip, Dialog, DialogTitle, DialogContent, DialogActions, TextField as MuiTextField, CircularProgress, Typography, Select, MenuItem, Stack, Link as MuiLink
+  Box, Container, TextField as MuiTextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, Typography, MenuItem, Stack,
 } from "@mui/material";
-import { Add, Edit, Delete, Search, MailOutlined, FilterList, CloudDownload, FileCopy } from "@mui/icons-material";
+import { Add, Edit, Delete, MailOutlined, FilterList, CloudDownload } from "@mui/icons-material";
 import api, { Application, Recruiter, Template, Resume, ApplicationStatus, ApplicationSource } from "../services/api";
 
-export const setSnack = (msg: string) => { /* noop, replaced by parent */ };
+export const noop = (_msg: string) => { /* noop, replaced by parent */ };
 
 export default function ApplicationsPage({ setSnack }: { setSnack: (msg: string) => void }) {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -96,19 +96,19 @@ export default function ApplicationsPage({ setSnack }: { setSnack: (msg: string)
       </Box>
 
       <Box sx={{ mb: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
-        <TextField fullWidth sm={12} md="auto" label="Company" value={filter.company} onChange={(e) => setFilter({ ...filter, company: e.target.value })} size="small" />
-        <TextField fullWidth sm={12} md="auto" label="Recruiter" value={filter.recruiter} onChange={(e) => setFilter({ ...filter, recruiter: e.target.value })} size="small" />
-        <TextField fullWidth sm={12} md="auto" label="Position" value={filter.position} onChange={(e) => setFilter({ ...filter, position: e.target.value })} size="small" />
-        <Select fullWidth sm={12} md="auto" label="Status" value={filter.status} onChange={(e) => setFilter({ ...filter, status: e.target.value })} size="small">
+        <MuiTextField fullWidth label="Company" value={filter.company} onChange={(e) => setFilter({ ...filter, company: e.target.value })} size="small" sx={{ maxWidth: 200 }} />
+        <MuiTextField fullWidth label="Recruiter" value={filter.recruiter} onChange={(e) => setFilter({ ...filter, recruiter: e.target.value })} size="small" sx={{ maxWidth: 200 }} />
+        <MuiTextField fullWidth label="Position" value={filter.position} onChange={(e) => setFilter({ ...filter, position: e.target.value })} size="small" sx={{ maxWidth: 200 }} />
+        <MuiTextField select fullWidth label="Status" value={filter.status} onChange={(e) => setFilter({ ...filter, status: e.target.value })} size="small" sx={{ maxWidth: 200 }}>
           <MenuItem value="">All</MenuItem>
           {statuses.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
-        </Select>
-        <Select fullWidth sm={12} md="auto" label="Source" value={filter.source} onChange={(e) => setFilter({ ...filter, source: e.target.value })} size="small">
+        </MuiTextField>
+        <MuiTextField select fullWidth label="Source" value={filter.source} onChange={(e) => setFilter({ ...filter, source: e.target.value })} size="small" sx={{ maxWidth: 200 }}>
           <MenuItem value="">All</MenuItem>
           {["LinkedIn", "Naukri", "Foundit", "Referral", "DirectRecruiter", "CompanyWebsite", "XTwitter", "WhatsApp"].map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
-        </Select>
-        <TextField type="date" fullWidth sm={12} md="auto" label="From" value={filter.startDate} onChange={(e) => setFilter({ ...filter, startDate: e.target.value })} size="small" />
-        <TextField type="date" fullWidth sm={12} md="auto" label="To" value={filter.endDate} onChange={(e) => setFilter({ ...filter, endDate: e.target.value })} size="small" />
+        </MuiTextField>
+        <MuiTextField type="date" fullWidth label="From" value={filter.startDate} onChange={(e) => setFilter({ ...filter, startDate: e.target.value })} size="small" sx={{ maxWidth: 200 }} InputLabelProps={{ shrink: true }} />
+        <MuiTextField type="date" fullWidth label="To" value={filter.endDate} onChange={(e) => setFilter({ ...filter, endDate: e.target.value })} size="small" sx={{ maxWidth: 200 }} InputLabelProps={{ shrink: true }} />
         <Button variant="contained" startIcon={<FilterList />} onClick={loadApplications}>Filter</Button>
       </Box>
 
@@ -154,7 +154,7 @@ export default function ApplicationsPage({ setSnack }: { setSnack: (msg: string)
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>{editing ? "Edit Application" : "Log New Application"}</DialogTitle>
         <DialogContent sx={{ pt: 1 }}>
-          <form onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 420 }}>
+          <Box component="form" id="application-form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 420 }}>
             <MuiTextField select required fullWidth label="Recruiter" value={form.recruiterId} onChange={(e) => setForm({ ...form, recruiterId: e.target.value })}>
               <MenuItem value="">Select recruiter</MenuItem>
               {recruiters.map((r) => <MenuItem key={r.id} value={r.id}>{r.name} - {r.company}</MenuItem>)}
@@ -179,11 +179,11 @@ export default function ApplicationsPage({ setSnack }: { setSnack: (msg: string)
             <MuiTextField type="date" fullWidth label="Next Follow-up Date (auto: applied + 7 days)" value={form.nextFollowupDate} onChange={(e) => setForm({ ...form, nextFollowupDate: e.target.value })} />
             <MuiTextField fullWidth label="Remarks" value={form.remarks} onChange={(e) => setForm({ ...form, remarks: e.target.value })} />
             <Typography component="span" variant="caption">Follow-up defaults to Applied + 7 days when not specified.</Typography>
-          </form>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button variant="contained" type="submit" form>Save</Button>
+          <Button variant="contained" type="submit" form="application-form">Save</Button>
         </DialogActions>
       </Dialog>
     </Container>

@@ -3,6 +3,7 @@ import { env } from "../config/env";
 
 export interface SendEmailInput {
   to: string;
+  cc?: string;
   subject: string;
   body: string;
   attachmentPath?: string;
@@ -19,7 +20,8 @@ export class MailService {
     subject: string,
     body: string,
     attachmentPath?: string,
-    attachmentName?: string
+    attachmentName?: string,
+    cc?: string
   ): Promise<{ messageId: string }> {
     const domain = env.mailgunDomain;
     const apiKey = env.mailgunApiKey;
@@ -28,10 +30,13 @@ export class MailService {
       throw new Error("MailGun not configured. Set MAILGUN_API_KEY and MAILGUN_DOMAIN in .env");
     }
 
-    const formData = new URLSearchParams();
+    const formData = new FormData() as any;
     const fromEmail = env.mailFrom || `Resumetracker <postmaster@${domain}>`;
     formData.append("from", fromEmail);
     formData.append("to", to);
+    if (cc) {
+      formData.append("cc", cc);
+    }
     formData.append("subject", subject);
     formData.append("html", body);
 
@@ -39,14 +44,11 @@ export class MailService {
       const fs = await import("fs");
       if (fs.existsSync(attachmentPath)) {
         const fileBuffer = fs.readFileSync(attachmentPath);
-        formData.append(
-          "attachment",
-          fileBuffer.toString("base64"),
-          {
-            filename: attachmentName,
-            contentType: "application/pdf",
-          }
-        );
+        formData.append("attachment", fileBuffer.toString("base64"), {
+          // filename + contentType encoding is handled by URLSearchParams/Blob
+          filename: attachmentName,
+          contentType: "application/pdf",
+        } as any);
       }
     }
 
@@ -70,7 +72,8 @@ export class MailService {
       input.subject,
       input.body,
       input.attachmentPath,
-      input.attachmentName
+      input.attachmentName,
+      input.cc
     );
 
     return { messageId };

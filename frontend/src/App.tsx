@@ -28,6 +28,7 @@ import {
   Event,
   Assessment,
   Settings,
+  MailOutlined
 } from "@mui/icons-material";
 import {
   Routes,
@@ -45,6 +46,7 @@ import RecruitersPage from "./pages/RecruitersPage";
 import TemplatesPage from "./pages/TemplatesPage";
 import ResumesPage from "./pages/ResumesPage";
 import ApplicationsPage from "./pages/ApplicationsPage";
+import QuickApplyPage from "./pages/QuickApplyPage";
 import FollowupsPage from "./pages/FollowupsPage";
 import SettingsPage from "./pages/SettingsPage";
 
@@ -74,6 +76,7 @@ function AppContent() {
     ["/applications", "Applications", Assessment],
     ["/followups", "Follow-ups", Event],
     ["/settings", "Settings", Settings],
+    ["/quick-apply", "Quick Apply", MailOutlined],
   ];
 
   const drawer = (
@@ -202,6 +205,7 @@ function AppContent() {
                 <Route path="/applications" element={<ApplicationsPage setSnack={triggerSnack} />} />
                 <Route path="/followups" element={<FollowupsPage setSnack={triggerSnack} />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/quick-apply" element={<QuickApplyPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </>
